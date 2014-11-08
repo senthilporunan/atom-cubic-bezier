@@ -1,0 +1,15 @@
+{
+  "name": "cubic-bezier",
+  "main": "./lib/cubic-bezier",
+  "version": "0.0.0",
+  "description": "A short description of your package",
+  "activationEvents": ["cubic-bezier:open"],
+  "repository": "https://github.com/atom/cubic-bezier",
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "dependencies": {
+    "jquery": ">=1.10.2"
+  }
+}

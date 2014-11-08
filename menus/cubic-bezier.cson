@@ -1,0 +1,16 @@
+# See https://atom.io/docs/latest/creating-a-package#menus for more details
+'context-menu':
+  '.overlayer':
+      'Enable cubic-bezier': 'cubic-bezier:open'
+
+#'menu': [
+#  {
+#    'label': 'Packages'
+#    'submenu': [
+#      'label': 'cubic-bezier'
+#      'submenu': [
+#        { 'label': 'Toggle', 'command': 'cubic-bezier:toggle' }
+#      ]
+#    ]
+#  }
+# ]
