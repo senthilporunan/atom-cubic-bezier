@@ -1,10 +1,11 @@
 {View} = require 'atom'
 $ = require('atom').$
-cubicBezier = require './cubic-bezier-curve'
+CubicBezierCurve = require './cubic-bezier-curve'
 hideWindow = false
 
 module.exports =
 class CubicBezierView extends View
+  @cubicBezier = new CubicBezierCurve()
   @content: ->
     @div class: 'cubic-bezier overlay from-top', =>
       @div id: "drawing-plane", class: "drawing-plane", =>
@@ -36,7 +37,9 @@ class CubicBezierView extends View
     else
       atom.workspaceView.append(this)
       @showGraph()
-      cubicBezier.showCubicBezier(this)
+      @cubicBezier = new CubicBezierCurve() unless @cubicBezier
+      console.log @cubicBezier
+      @cubicBezier.showCubicBezier()
 
 
   showGraph: ->
