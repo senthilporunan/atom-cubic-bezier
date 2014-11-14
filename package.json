@@ -1,10 +1,10 @@
 {
   "name": "cubic-bezier",
   "main": "./lib/cubic-bezier",
-  "version": "0.0.0",
-  "description": "A short description of your package",
+  "version": "0.0.1",
+  "description": "Cubic Bezier curve: An easing function generator for Atom editor",
   "activationEvents": ["cubic-bezier:open"],
-  "repository": "https://github.com/atom/cubic-bezier",
+  "repository": "https://github.com/senthilporunan/cubic-bezier",
   "license": "MIT",
   "engines": {
     "atom": ">0.50.0"
