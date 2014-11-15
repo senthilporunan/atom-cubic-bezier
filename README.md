@@ -1,4 +1,4 @@
 atom-cubic-bezier
 =================
 
-Atom editor plugin to generate Cubic-bezier on fly
+Cubic Bezier curve: An easing function generator for Atom editor (Under development)
