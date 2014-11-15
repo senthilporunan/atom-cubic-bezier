@@ -1,3 +1,4 @@
+atomJquery = require('atom').$
 $ = require("jquery")
 require('jquery-ui/draggable');
 
@@ -70,6 +71,8 @@ class CubicBezierCurve
 		@context = canvas.getContext("2d")
 		@drawInitialCurve()
 
+		$('#okButton').click (e) => @applyToEditor()
+
 
 		drag = () =>
 			self = this
@@ -95,6 +98,7 @@ class CubicBezierCurve
 		$(canvas).on 'mousemove', (e) => @timeDelay e
 		@plotCurve()
 		@playBall()
+
 
 
 	validateBezierPoint : (p) ->
@@ -244,9 +248,6 @@ class CubicBezierCurve
 		clearInterval(@playBallPlayer)
 		@playBallPlaying = false
 
-
-
-	#	$("#playBall").css "transition-timing-function", "cubic-bezier(" + @points[0] + "," + @points[1] + "," + @points[2] + "," + @points[3] + ")"
-	#	$("#playBall").css "transition-duration", "1.0s"
-	#	$("#playBall").css "position", "relative"
-	#	$("#playBall").css "left", "100%"
+	applyToEditor: () ->
+		editor = atom.workspace.getActiveEditor()
+		editor.replaceSelectedText null, =>  "cubic-bezier(" + @points.join() + ")"
