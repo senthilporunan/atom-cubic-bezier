@@ -38,7 +38,6 @@ class CubicBezierView extends View
       atom.workspaceView.append(this)
       @showGraph()
       @cubicBezier = new CubicBezierCurve() unless @cubicBezier
-      console.log @cubicBezier
       @cubicBezier.showCubicBezier()
 
 

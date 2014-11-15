@@ -181,8 +181,8 @@ class CubicBezierCurve
 		#bg color
 		@context.fillStyle = "rgb(255, 255, 255)"
 		@context.font = "14px times"
-		@context.fillText "DURATION(" + @delay + "%)", dx, dty
-		@context.fillText "TRANSITION(" + @transition + "%)", dx, ddy
+		@context.fillRect 0, dty - 15, w, 20
+		@context.fillRect 0, ddy - 15, w, 20
 
 		@context.fillStyle = "rgba(0, 0, 0, 0.4)"
 		@context.font = "14px times"
