@@ -229,7 +229,9 @@ class CubicBezierCurve
 				$("#playBall").css
 					"transition-timing-function": "cubic-bezier(" + @points.join() + ")"
 					"transition-duration": @playDurationInSec + "s"
+					"transition-property": "all"
 					"top" : (if startState then start else end) + "px"
+
 				startState = not startState
 
 		playMe = play()
