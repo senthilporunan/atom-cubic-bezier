@@ -14,7 +14,7 @@ class CubicBezierView extends View
         @button id: "P0", class: "curve-pointer moveable ui-draggable ui-draggable-handle"
         @button id: "P1", class: "curve-pointer moveable ui-draggable ui-draggable-handle"
         @button id: "playBall", class: "curve-pointer moveable"
-        @select id: "easingList", style: "width: 214px; height: 25px;", =>
+        @select id: "easingList", style: "width: 214px; height: 31px;", =>
           @option value: "default", selected: true, "default"
           @option value: "linear", "linear"
           @option value: "ease", "ease"
@@ -22,8 +22,8 @@ class CubicBezierView extends View
           @option value: "easeInOut", "easeInOut"
           @option value: "easeOut", "easeOut"
       @div id: "drawing-button", =>
-        @button id: "okButton", style: "width:60px;height: 30px;padding: 10px;margin:10px;", "Save"
-        @button id: "cancelButton", style: "width:60px;height: 30px;padding: 10px;margin:10px;", "Close"
+        @button id: "okButton", style: "width:107px;height: 30px;margin: 5px 4px 0 0px;", "Save"
+        @button id: "cancelButton", style: "width:107px;height: 30px;margin-top:5px;", "Close"
 
 
 

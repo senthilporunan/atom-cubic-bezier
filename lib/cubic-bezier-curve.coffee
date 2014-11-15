@@ -109,7 +109,6 @@ class CubicBezierCurve
 
 	initPlot : (w, p) ->
 
-		#reset screen
 		@context.canvas.width = @context.canvas.width
 		@context.fillStyle = "rgba(0, 0, 0, 0.025)"
 		ticks = w / 10
@@ -250,10 +249,10 @@ class CubicBezierCurve
 		@playBallPlaying = false
 
 	applyToEditor: () ->
+		console.log("INisde applyToEditor")
 		editor = atom.workspace.getActiveEditor()
 		editor.replaceSelectedText null, =>  "cubic-bezier(" + @points.join() + ")"
 		editor.clearSelections()
-		@points = {}
 		editor.addSelectionForBufferRange
 			start:
 				column: @matcher.start
@@ -263,6 +262,8 @@ class CubicBezierCurve
 				row: @matcher.row
 
 		$(".cubic-bezier").css "display", 'none'
+		# Reset Points
+		@points = {}
 
 	selectMatches: () ->
 		editor = atom.workspace.getActiveEditor()
