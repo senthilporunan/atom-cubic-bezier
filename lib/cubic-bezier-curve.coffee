@@ -29,10 +29,7 @@ class CubicBezierCurve
 		y1 = +(((ah - (p0.y - pdh - adj)) / ah).toFixed(2))
 		x2 = +(((p1.x - pdw) * 1.0 / w).toFixed(2))
 		y2 = +(((ah - (p1.y - pdh - adj)) / ah).toFixed(2))
-		$(".cb-x1").text "(" + x1 + ", "
-		$(".cb-x2").text x2 + ", "
-		$(".cb-y1").text y1 + ", "
-		$(".cb-y2").text y2 + ")"
+
 		fph = $("#FP0").height() - 2
 		fpw = $("#FP0").width() - 2
 
@@ -96,6 +93,9 @@ class CubicBezierCurve
 			cancel: false
 			stack: ".curve-pointer"
 
+		$(canvas).on 'mousemove', (e) => @timeDelay e
+
+
 		@plotCurve()
 
 	validateBezierPoint : (p) ->
@@ -148,6 +148,7 @@ class CubicBezierCurve
 		w = canvasGraph.width
 		h = canvasGraph.height
 		throw "height=" + h + "width=" + w + " is not greater than width"  if h < w
+
 		adj = (h - w) / 2
 		parent = $$.parent()
 		pdh = parent.outerHeight(true) - parent.innerHeight()
@@ -166,24 +167,35 @@ class CubicBezierCurve
 		]
 
 	timeDelay : (e) ->
-		@context.font = "14px times"
-		@context.fillStyle = "rgba(0, 0, 0, 0.4)"
+		#bg color
 		mx = e and (e.offsetX or e.clientX - $(e.target).offset().left)
 		my = e and (e.offsetY or e.clientY - $(e.target).offset().top)
 		w = @context.canvas.width
 		h = @context.canvas.height
 		adj = (h - w) / 2
-		if not e or e.type isnt "mousemove" or not mx or not my
+		dx = w/ 3.5
+		dty = w + adj + 30
+		ddy = adj - 10
+
+		@context.fillStyle = "rgb(255, 255, 255)"
+		@context.font = "14px times"
+		@context.fillText "DURATION(" + @delay + "%)", dx, dty
+		@context.fillText "TRANSITION(" + @transition + "%)", dx, ddy
+
+		@context.fillStyle = "rgba(0, 0, 0, 0.4)"
+		@context.font = "14px times"
+
+		if not e or (e.type isnt 'mousemove') or not mx or not my
 			@context.fillText "DURATION", w / 3.5, w + adj + 30
 			@context.fillText "TRANSITION", w / 3.5, adj - 10
 		else
 			ah = h - 2.0 * adj
 			parent = $("#cubic-bezier").parent()
 			pdh = parent.outerHeight(true) - parent.innerHeight()
-			transition = parseInt((+(((ah - (my - pdh - adj)) / ah).toFixed(2))) * 100)
-			delay = parseInt(Math.ceil(mx / w * 100))
-			@context.fillText "DURATION(" + delay + "%)", w / 3.5, w + adj + 30
-			@context.fillText "TRANSITION(" + transition + "%)", w / 3.5, adj - 10
+			@transition = parseInt((+(((ah - (my - pdh - adj)) / ah).toFixed(2))) * 100)
+			@delay = parseInt(Math.ceil(mx / w * 100))
+			@context.fillText "DURATION(" + @delay + "%)", dx, dty
+			@context.fillText "TRANSITION(" + @transition + "%)", dx, ddy
 
 	drawPoints : (points) ->
 		throw "Invalid points: " + points  if not points or points.length isnt 4
