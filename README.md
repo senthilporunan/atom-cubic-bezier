@@ -1,4 +1,4 @@
 atom-cubic-bezier
 =================
 
-Cubic Bezier curve: An easing function generator for Atom editor (Under development)
+atom-cubic-bezier  is an easing function generator for Atom editor (Under development)
