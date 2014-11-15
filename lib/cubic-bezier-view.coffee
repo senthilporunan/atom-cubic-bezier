@@ -14,9 +14,13 @@ class CubicBezierView extends View
         @button id: "P0", class: "curve-pointer moveable ui-draggable ui-draggable-handle"
         @button id: "P1", class: "curve-pointer moveable ui-draggable ui-draggable-handle"
         @button id: "playBall", class: "curve-pointer moveable"
+        @select id: "easingList", style: "width: 214px; height: 25px;", =>
+          @option value: "m1", "M111"
+          @option value: "m2", "M221"
+          @option value: "m3", "M331"
       @div id: "drawing-button", =>
         @button id: "okButton", style: "width:60px;height: 30px;padding: 10px;margin:10px;", "Save"
-        @button id: "cancelButton",  style: "width:60px;height: 30px;padding: 10px;margin:10px;", "Cancel"
+        @button id: "cancelButton", style: "width:60px;height: 30px;padding: 10px;margin:10px;", "Close"
 
 
 
@@ -32,18 +36,7 @@ class CubicBezierView extends View
     @detach()
 
   toggle: ->
-    if @hasParent()
-      @detach()
-    else
-      atom.workspaceView.append(this)
-      @showGraph()
-      @cubicBezier = new CubicBezierCurve() unless @cubicBezier
-      console.log @cubicBezier
-      @cubicBezier.showCubicBezier()
-
-
-  showGraph: ->
-    #TODO: Take care implementation of ok and cancel button
-    $ -> $('#cancelButton').click ->
-          @toggle()
-          hideWindow = true
+    atom.workspaceView.append(this)
+    @cubicBezier = new CubicBezierCurve() unless @cubicBezier
+    console.log @cubicBezier
+    @cubicBezier.showCubicBezier()

@@ -63,13 +63,15 @@ class CubicBezierCurve
 		@timeDelay e
 
 	showCubicBezier : ->
+		$(".cubic-bezier").css "display", 'initial'
 		@self = this
 		@playDurationInSec = 1.0
 
 		canvas = document.getElementById("cubic-bezier")
 		@context = canvas.getContext("2d")
 		@drawInitialCurve()
-
+		$('#okButton').click (e) => @applyToEditor()
+		$('#cancelButton').click (e) =>  $(".cubic-bezier").css "display", 'none'
 
 		drag = () =>
 			self = this
@@ -95,7 +97,6 @@ class CubicBezierCurve
 		$(canvas).on 'mousemove', (e) => @timeDelay e
 		@plotCurve()
 		@playBall()
-
 
 	validateBezierPoint : (p) ->
 		return true  if p and p.x >= 0 and p.x <= 1 and p.y < 2 and p.y > -2
@@ -244,9 +245,6 @@ class CubicBezierCurve
 		clearInterval(@playBallPlayer)
 		@playBallPlaying = false
 
-
-
-	#	$("#playBall").css "transition-timing-function", "cubic-bezier(" + @points[0] + "," + @points[1] + "," + @points[2] + "," + @points[3] + ")"
-	#	$("#playBall").css "transition-duration", "1.0s"
-	#	$("#playBall").css "position", "relative"
-	#	$("#playBall").css "left", "100%"
+	applyToEditor: () ->
+		editor = atom.workspace.getActiveEditor()
+		editor.replaceSelectedText null, =>  "cubic-bezier(" + @points.join() + ")"
