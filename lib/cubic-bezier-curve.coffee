@@ -67,16 +67,16 @@ class CubicBezierCurve
 		$(".cubic-bezier").css "display", 'initial'
 		@self = this
 		@playDurationInSec = 1.0
-		# reset points
-		@points = {}
+
 		$("#easingList").val "default"
 
 		canvas = document.getElementById("cubic-bezier")
 		@context = canvas.getContext("2d")
-		@drawInitialCurve()
+		@selectMatches()
+
 		$('#okButton').click (e) => @applyToEditor()
 		$('#cancelButton').click (e) =>  $(".cubic-bezier").css "display", 'none'
-		$('#easingList').change (e) => @changeEasing()
+		$('#easingList').change (e) => @changeEasing($("#easingList").val())
 
 		drag = () =>
 			self = this
@@ -117,9 +117,6 @@ class CubicBezierCurve
 		y = w + p - ticks
 		x = w / ticks - 1
 
-		# reset points
-		@points = {}
-
 		while y >= p
 			if x is 5
 				@context.fillStyle = "rgba(55, 80, 190, 0.25)"
@@ -146,11 +143,6 @@ class CubicBezierCurve
 		@context.lineTo Math.abs(fph - fpw), w + p
 		@context.closePath()
 		@context.fill()
-
-	drawInitialCurve : ->
-		@selectMatches()
-		@coordinatesToPoints({top: 0.31, left: 0.74}, {top: 0.80, left: 0.37}, $("#cubic-bezier"))
-		@drawPoints()
 
 	coordinatesToPoints : (p0, p1, $$) ->
 		canvasGraph = document.getElementById("cubic-bezier")
@@ -210,6 +202,7 @@ class CubicBezierCurve
 	drawPoints : () ->
 		points = @points
 		console.log("Draw Points: " +points)
+		console.dir points
 		throw "Invalid points: " + points  if not points or points.length isnt 4
 
 		$("#P0").css "top", points[1]
@@ -261,17 +254,16 @@ class CubicBezierCurve
 
 	applyToEditor: () ->
 		editor = atom.workspace.getActiveEditor()
-	    editor.clearSelections()
-    	editor.addSelectionForBufferRange
-			start:
-				column: @match.index
-				row: @match.row
-			end:
-				column: @match.index + splineCSS.length
-				row: @match.row
-
 		editor.replaceSelectedText null, =>  "cubic-bezier(" + @points.join() + ")"
-		@points = {}
+		editor.clearSelections()
+		editor.addSelectionForBufferRange
+			start:
+				column: @matcher.start
+				row: @matcher.row
+			end:
+				column: @matcher.end
+				row: @matcher.row
+
 		$(".cubic-bezier").css "display", 'none'
 
 	selectMatches: () ->
@@ -283,8 +275,25 @@ class CubicBezierCurve
 
 		points = @parseSelectedMatch()
 		unless points
-			# linear curve - get from map
-			points = [0.0, 0.0, 1.0, 1.0]
+			points = 'default'
+
+		predefined =
+			ease: 'ease'
+			linear: 'linear'
+			'ease-in': 'easeIn'
+			'ease-out': 'easeOut'
+			'ease-in-out' : 'easeInOut'
+			'default': 'default'
+
+		if predefined[points]?
+			@changeEasing predefined[points]
+		else
+			console.log points
+			console.log 'else...'
+			@coordinatesToPoints({top: points[1], left: points[0]}, {top: points[3], left: points[2]}, $("#cubic-bezier"))
+			@drawPoints()
+			@plotCurve()
+			@playBall()
 
 
 	selectLineMatches: (line, pos) ->
@@ -329,11 +338,13 @@ class CubicBezierCurve
 	parseSelectedMatch: () ->
 		return unless @matcher?
 
-		{pattern, select} = matcher
-		
+		{pattern, select} = @matcher
+
 		return unless pattern or select
 
-		[x1, y1, x2, y2] = select.match(pattern)
+		[_, x1, y1, x2, y2] = p = select.match(pattern)
+
+		console.log p
 
 		if y1?
 			[x1, y1, x2, y2] = p = [
@@ -343,12 +354,10 @@ class CubicBezierCurve
 				parseFloat y2
 			]
 			return p if @validateBezierPoint p
-		else
-			# integrate lookup table
 
-		return
+		return x1
 
-	changeEasing: () =>
+	changeEasing: (easing) =>
 		easingList =
 			"default": [ 0.74, 0.31, 0.37, 0.8 ]
 			"linear": [0.0, 0.0, 1.0, 1.0 ]
@@ -357,10 +366,11 @@ class CubicBezierCurve
 			"easeInOut": [ 0.42, 0.0, 0.58, 1.0 ]
 			"easeOut": [ 0.0, 0.0, 0.58, 1.0 ]
 
-		currentFunction = $.map(easingList, (value, index) =>
-			if index is $("#easingList").val()
-				@coordinatesToPoints({top: value[1], left: value[0]}, {top: value[3], left: value[2]}, $("#cubic-bezier"))
-		)
+
+		$.map(easingList, (value, key) =>
+			if key is easing
+				@coordinatesToPoints({top: value[1], left: value[0]}, {top: value[3], left: value[2]}, $("#cubic-bezier")))
+
 		@drawPoints()
 		@plotCurve()
 		@playBall()
