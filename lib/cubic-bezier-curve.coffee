@@ -4,9 +4,6 @@ require('jquery-ui/draggable');
 module.exports =
 class CubicBezierCurve
 
-	@self = this
-	@points = [0.0, 0.0, 1.0, 1.0]
-
 	plotCurve : (e) ->
 
 		# coordinates
@@ -66,6 +63,9 @@ class CubicBezierCurve
 		@timeDelay e
 
 	showCubicBezier : ->
+		@self = this
+		@playDurationInSec = 1.0
+
 		canvas = document.getElementById("cubic-bezier")
 		@context = canvas.getContext("2d")
 		@drawInitialCurve()
@@ -81,7 +81,6 @@ class CubicBezierCurve
 				$(this).data "x", left
 				$(this).data "y", top
 				self.plotCurve e
-				self.playBall()
 
 		dragger = drag()
 
@@ -94,9 +93,9 @@ class CubicBezierCurve
 			stack: ".curve-pointer"
 
 		$(canvas).on 'mousemove', (e) => @timeDelay e
-
-
 		@plotCurve()
+		@playBall()
+
 
 	validateBezierPoint : (p) ->
 		return true  if p and p.x >= 0 and p.x <= 1 and p.y < 2 and p.y > -2
@@ -139,9 +138,8 @@ class CubicBezierCurve
 		@context.fill()
 
 	drawInitialCurve : ->
-		# add selection code here
-		points = @coordinatesToPoints({top: 0.31, left: 0.74}, {top: 0.80, left: 0.37}, $("#cubic-bezier"))
-		@drawPoints points
+		@coordinatesToPoints({top: 0.31, left: 0.74}, {top: 0.80, left: 0.37}, $("#cubic-bezier"))
+		@drawPoints()
 
 	coordinatesToPoints : (p0, p1, $$) ->
 		canvasGraph = document.getElementById("cubic-bezier")
@@ -159,7 +157,7 @@ class CubicBezierCurve
 		x2 = parseInt(p1.left * gw)
 		y1 = parseInt((if (p0.top > 1) then (1 - p0.top) * w + adj else ((if (p0.top < 0) then (Math.abs(p0.top) * w) + w + adj else (w - p0.top * w) + adj))))
 		y2 = parseInt((if (p1.top > 1) then (1 - p1.top) * w + adj else ((if (p1.top < 0) then (Math.abs(p1.top) * w) + w + adj else (w - p1.top * w) + adj))))
-		[
+		@points = [
 			x1
 			y1
 			x2
@@ -167,7 +165,6 @@ class CubicBezierCurve
 		]
 
 	timeDelay : (e) ->
-		#bg color
 		mx = e and (e.offsetX or e.clientX - $(e.target).offset().left)
 		my = e and (e.offsetY or e.clientY - $(e.target).offset().top)
 		w = @context.canvas.width
@@ -177,6 +174,7 @@ class CubicBezierCurve
 		dty = w + adj + 30
 		ddy = adj - 10
 
+		#bg color
 		@context.fillStyle = "rgb(255, 255, 255)"
 		@context.font = "14px times"
 		@context.fillText "DURATION(" + @delay + "%)", dx, dty
@@ -197,8 +195,10 @@ class CubicBezierCurve
 			@context.fillText "DURATION(" + @delay + "%)", dx, dty
 			@context.fillText "TRANSITION(" + @transition + "%)", dx, ddy
 
-	drawPoints : (points) ->
+	drawPoints : () ->
+		points = @points
 		throw "Invalid points: " + points  if not points or points.length isnt 4
+
 		$("#P0").css "top", points[1]
 		$("#P0").css "left", points[0]
 		$("#P1").css "top", points[3]
@@ -209,9 +209,42 @@ class CubicBezierCurve
 		$("#P1").data "y", points[3]
 
 	playBall : ->
-		playingAnimation = true
+		return if @playBallPlaying
+		w = @context.canvas.width
+		h = @context.canvas.height
+		adj = (h - w) / 2
+		phh = $('#playBall').height() / 2
+		pdw = $('#playBall').width() * 2
 
-		$("#playBall").css "transition-timing-function", "cubic-bezier(" + @points[0] + "," + @points[1] + "," + @points[2] + "," + @points[3] + ")"
-		$("#playBall").css "transition-duration", "1.0s"
-		$("#playBall").css "position", "relative"
-		$("#playBall").css "left", "100%"
+		start = adj - phh
+		end = w + adj - phh
+
+		$("#playBall").css "top", start
+		$("#playBall").css "left", (w + pdw)
+
+
+		play = () =>
+			startState = true
+			() =>
+				$("#playBall").css
+					"transition-timing-function": "cubic-bezier(" + @points.join() + ")"
+					"transition-duration": @playDurationInSec + "s"
+					"top" : (if startState then start else end) + "px"
+				startState = not startState
+
+		playMe = play()
+		playMe()
+		@playBallPlayer = window.setInterval playMe, @playDurationInSec * 1000
+		@playBallPlaying = true
+
+	stopPlayBall : ->
+		return unless @playBallPlaying
+		clearInterval(@playBallPlayer)
+		@playBallPlaying = false
+
+
+
+	#	$("#playBall").css "transition-timing-function", "cubic-bezier(" + @points[0] + "," + @points[1] + "," + @points[2] + "," + @points[3] + ")"
+	#	$("#playBall").css "transition-duration", "1.0s"
+	#	$("#playBall").css "position", "relative"
+	#	$("#playBall").css "left", "100%"

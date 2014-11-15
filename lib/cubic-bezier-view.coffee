@@ -5,7 +5,6 @@ hideWindow = false
 
 module.exports =
 class CubicBezierView extends View
-  @cubicBezier = new CubicBezierCurve()
   @content: ->
     @div class: 'cubic-bezier overlay from-top', =>
       @div id: "drawing-plane", class: "drawing-plane", =>
@@ -14,7 +13,7 @@ class CubicBezierView extends View
         @button id: "FP1", class: "curve-pointer fixed"
         @button id: "P0", class: "curve-pointer moveable ui-draggable ui-draggable-handle"
         @button id: "P1", class: "curve-pointer moveable ui-draggable ui-draggable-handle"
-        @canvas id: "playBall", height: '60px', width: '60px', class: "curve-pointer moveable"
+        @button id: "playBall", class: "curve-pointer moveable"
       @div id: "drawing-button", =>
         @button id: "okButton", style: "width:60px;height: 30px;padding: 10px;margin:10px;", "Save"
         @button id: "cancelButton",  style: "width:60px;height: 30px;padding: 10px;margin:10px;", "Cancel"
@@ -22,6 +21,7 @@ class CubicBezierView extends View
 
 
   initialize: (serializeState) ->
+    @cubicBezier = new CubicBezierCurve()
     atom.workspaceView.command "cubic-bezier:open", => @toggle()
 
   # Returns an object that can be retrieved when package is activated
