@@ -64,15 +64,19 @@ class CubicBezierCurve
 		@timeDelay e
 
 	showCubicBezier : ->
+		$(".cubic-bezier").css "display", 'initial'
 		@self = this
 		@playDurationInSec = 1.0
+		# reset points
+		@points = {}
+		$("#easingList").val "default"
 
 		canvas = document.getElementById("cubic-bezier")
 		@context = canvas.getContext("2d")
 		@drawInitialCurve()
-
 		$('#okButton').click (e) => @applyToEditor()
-
+		$('#cancelButton').click (e) =>  $(".cubic-bezier").css "display", 'none'
+		$('#easingList').change (e) => @changeEasing()
 
 		drag = () =>
 			self = this
@@ -99,8 +103,6 @@ class CubicBezierCurve
 		@plotCurve()
 		@playBall()
 
-
-
 	validateBezierPoint : (p) ->
 		return false unless p
 		[x1, y1, x2, y2] = p
@@ -114,6 +116,9 @@ class CubicBezierCurve
 		ticks = w / 10
 		y = w + p - ticks
 		x = w / ticks - 1
+
+		# reset points
+		@points = {}
 
 		while y >= p
 			if x is 5
@@ -159,6 +164,7 @@ class CubicBezierCurve
 		pdw = parent.outerWidth(true) - parent.innerWidth()
 		gw = w - pdw
 		gh = h - pdh
+
 		x1 = parseInt(p0.left * gw)
 		x2 = parseInt(p1.left * gw)
 		y1 = parseInt((if (p0.top > 1) then (1 - p0.top) * w + adj else ((if (p0.top < 0) then (Math.abs(p0.top) * w) + w + adj else (w - p0.top * w) + adj))))
@@ -203,6 +209,7 @@ class CubicBezierCurve
 
 	drawPoints : () ->
 		points = @points
+		console.log("Draw Points: " +points)
 		throw "Invalid points: " + points  if not points or points.length isnt 4
 
 		$("#P0").css "top", points[1]
@@ -264,6 +271,8 @@ class CubicBezierCurve
 				row: @match.row
 
 		editor.replaceSelectedText null, =>  "cubic-bezier(" + @points.join() + ")"
+		@points = {}
+		$(".cubic-bezier").css "display", 'none'
 
 	selectMatches: () ->
 		editor = atom.workspace.getActiveEditor()
@@ -338,3 +347,20 @@ class CubicBezierCurve
 			# integrate lookup table
 
 		return
+
+	changeEasing: () =>
+		easingList =
+			"default": [ 0.74, 0.31, 0.37, 0.8 ]
+			"linear": [0.0, 0.0, 1.0, 1.0 ]
+			"ease": [ 0.25, 0.1, 0.25, 0.1 ]
+			"easeIn": [ 0.42, 0.0, 1.0, 1.0 ]
+			"easeInOut": [ 0.42, 0.0, 0.58, 1.0 ]
+			"easeOut": [ 0.0, 0.0, 0.58, 1.0 ]
+
+		currentFunction = $.map(easingList, (value, index) =>
+			if index is $("#easingList").val()
+				@coordinatesToPoints({top: value[1], left: value[0]}, {top: value[3], left: value[2]}, $("#cubic-bezier"))
+		)
+		@drawPoints()
+		@plotCurve()
+		@playBall()
