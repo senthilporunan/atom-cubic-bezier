@@ -102,8 +102,9 @@ class CubicBezierCurve
 
 
 	validateBezierPoint : (p) ->
-		return true  if p and p.x >= 0 and p.x <= 1 and p.y < 2 and p.y > -2
-		false
+		return false unless p
+		[x1, y1, x2, y2] = p
+		return true  if (x1 >= 0 and x1 <= 1 and y1 < 2 and y1 > -2) and (x2 >= 0 and x2 <= 1 and y2 < 2 and y2 > -2)
 
 	initPlot : (w, p) ->
 
@@ -142,6 +143,7 @@ class CubicBezierCurve
 		@context.fill()
 
 	drawInitialCurve : ->
+		@selectMatches()
 		@coordinatesToPoints({top: 0.31, left: 0.74}, {top: 0.80, left: 0.37}, $("#cubic-bezier"))
 		@drawPoints()
 
@@ -235,6 +237,8 @@ class CubicBezierCurve
 					"transition-duration": @playDurationInSec + "s"
 					"transition-property": "all"
 					"top" : (if startState then start else end) + "px"
+					"opacity" : (if startState then '0.86' else '0.6')
+					"background-color": (if startState then 'rgba(50, 205, 149, 0.86)' else 'deepskyblue')
 
 				startState = not startState
 
@@ -250,4 +254,87 @@ class CubicBezierCurve
 
 	applyToEditor: () ->
 		editor = atom.workspace.getActiveEditor()
+	    editor.clearSelections()
+    	editor.addSelectionForBufferRange
+			start:
+				column: @match.index
+				row: @match.row
+			end:
+				column: @match.index + splineCSS.length
+				row: @match.row
+
 		editor.replaceSelectedText null, =>  "cubic-bezier(" + @points.join() + ")"
+
+	selectMatches: () ->
+		editor = atom.workspace.getActiveEditor()
+		line = editor.getLastCursor().getCurrentBufferLine()
+		pos = editor.getCursorBufferPosition()
+
+		@matcher = @selectLineMatches line, pos
+
+		points = @parseSelectedMatch()
+		unless points
+			# linear curve - get from map
+			points = [0.0, 0.0, 1.0, 1.0]
+
+
+	selectLineMatches: (line, pos) ->
+		row = pos.row
+		col = pos.column
+
+		num = "\\d|\\d?\\.\\d+"
+		plusSign = "\\+?"
+		sign = "(?:\\+|-)?"
+		spaces = "\\s*"
+		patterns = [
+			///
+				cubic-bezier#{spaces}
+				\(
+					#{spaces}(#{plusSign}#{num})#{spaces},
+					#{spaces}(#{sign}#{num})#{spaces},
+					#{spaces}(#{plusSign}#{num})#{spaces},
+					#{spaces}(#{sign}#{num})#{spaces}
+				\)
+			///g
+			///
+				(ease|linear|ease-in|ease-out|ease-in-out)
+			///g
+		]
+
+		for pattern in patterns
+			matches = line.match pattern
+			console.log matches + " " + pattern
+			if matches?
+				for match in matches
+					idx = line.indexOf match
+					len = match.length
+					console.log 'len - ' + len
+					console.log 'idx - ' + idx
+					console.log 'match - ' + match
+					console.log 'col - ' + col
+					if idx isnt -1 and idx <= col and idx + len >= col
+						return { start: idx, end: idx+len, pattern: pattern, select: match, row: row}
+		return {start: col, end: col, row: row}
+
+
+	parseSelectedMatch: () ->
+		return unless @matcher?
+
+		{pattern, select} = matcher
+		
+		return unless pattern or select
+
+		[x1, y1, x2, y2] = select.match(pattern)
+
+		if y1?
+			[x1, y1, x2, y2] = p = [
+				parseFloat x1
+				parseFloat y1
+				parseFloat x2
+				parseFloat y2
+			]
+			return p if @validateBezierPoint p
+		else
+			# integrate lookup table
+
+		return
