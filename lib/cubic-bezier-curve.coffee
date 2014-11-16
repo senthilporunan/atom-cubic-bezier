@@ -249,21 +249,9 @@ class CubicBezierCurve
 		@playBallPlaying = false
 
 	applyToEditor: () ->
-		console.log("INisde applyToEditor")
 		editor = atom.workspace.getActiveEditor()
-		editor.replaceSelectedText null, =>  "cubic-bezier(" + @points.join() + ")"
-		editor.clearSelections()
-		editor.addSelectionForBufferRange
-			start:
-				column: @matcher.start
-				row: @matcher.row
-			end:
-				column: @matcher.end
-				row: @matcher.row
-
+		editor.replaceSelectedText null, => "cubic-bezier(" + @points.join() + ")"
 		$(".cubic-bezier").css "display", 'none'
-		# Reset Points
-		@points = {}
 
 	selectMatches: () ->
 		editor = atom.workspace.getActiveEditor()
@@ -287,13 +275,13 @@ class CubicBezierCurve
 		if predefined[points]?
 			@changeEasing predefined[points]
 		else
-			console.log points
-			console.log 'else...'
 			@coordinatesToPoints({top: points[1], left: points[0]}, {top: points[3], left: points[2]}, $("#cubic-bezier"))
 			@drawPoints()
 			@plotCurve()
 			@playBall()
 
+		editor = atom.workspace.getActiveEditor()
+		editor.addSelectionForBufferRange([[@matcher.row, @matcher.start], [@matcher.row, @matcher.end]])
 
 	selectLineMatches: (line, pos) ->
 		row = pos.row
@@ -320,15 +308,10 @@ class CubicBezierCurve
 
 		for pattern in patterns
 			matches = line.match pattern
-			console.log matches + " " + pattern
 			if matches?
 				for match in matches
 					idx = line.indexOf match
 					len = match.length
-					console.log 'len - ' + len
-					console.log 'idx - ' + idx
-					console.log 'match - ' + match
-					console.log 'col - ' + col
 					if idx isnt -1 and idx <= col and idx + len >= col
 						return { start: idx, end: idx+len, pattern: pattern, select: match, row: row}
 		return {start: col, end: col, row: row}
@@ -341,9 +324,8 @@ class CubicBezierCurve
 
 		return unless pattern or select
 
-		[_, x1, y1, x2, y2] = p = select.match(pattern)
+		[predefined, x1, y1, x2, y2] = p = select.match(pattern)
 
-		console.log p
 
 		if y1?
 			[x1, y1, x2, y2] = p = [
@@ -354,7 +336,7 @@ class CubicBezierCurve
 			]
 			return p if @validateBezierPoint p
 
-		return x1
+		return predefined
 
 	changeEasing: (easing) =>
 		easingList =
