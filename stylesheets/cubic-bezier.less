@@ -16,18 +16,26 @@ div.drawing-plane {
 }
 .overlay {
   width: 240px;
-  height: 620px;
+  height: 625px;
   background-color: white !important;
 }
 
 #FP0 {
   top: 370px;
   left: 0px;
-  z-index: 102;
+  z-index: 100;
 }
 #FP1 {
   top: 170px;
   left: 200px;
+  z-index: 101;
+}
+#P0 {
+  background-color: deepskyblue;
+  z-index: 102;
+}
+#P1 {
+  background-color: rgba(50, 205, 149, 1);
   z-index: 103;
 }
 #FP0, #FP1, #P0, #P1 {
@@ -76,4 +84,36 @@ canvas {
 
 #playBall {
     cursor: inherit;
+}
+select {
+  color: #263248;
+  display: block;
+  text-indent: 0.44em;
+  font-size: 13px;
+  padding: 0.177em 0px;
+  background-color: #DADADA;
+  font-style: italic;
+  font-weight: bold;
+  opacity: 0.8;
+  text-decoration: none;
+}
+
+select:hover {
+  opacity: 1;
+  background-color: #CACADA;
+}
+button {
+  color: #515967;
+  background-color: #F3F3F4;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 15px;
+  border: 1px solid  #DBDBDE;
+  font-style: italic;
+  font-weight: bold;
+}
+button:hover {
+  color: #263248;
+  border-color: #B6BDCA;
+  background-color: #B6BDCA;
 }

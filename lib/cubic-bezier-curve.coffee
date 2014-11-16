@@ -1,4 +1,3 @@
-atomJquery = require('atom').$
 $ = require("jquery")
 require('jquery-ui/draggable');
 
@@ -110,7 +109,6 @@ class CubicBezierCurve
 
 	initPlot : (w, p) ->
 
-		#reset screen
 		@context.canvas.width = @context.canvas.width
 		@context.fillStyle = "rgba(0, 0, 0, 0.025)"
 		ticks = w / 10
@@ -201,8 +199,6 @@ class CubicBezierCurve
 
 	drawPoints : () ->
 		points = @points
-		console.log("Draw Points: " +points)
-		console.dir points
 		throw "Invalid points: " + points  if not points or points.length isnt 4
 
 		$("#P0").css "top", points[1]
@@ -253,6 +249,7 @@ class CubicBezierCurve
 		@playBallPlaying = false
 
 	applyToEditor: () ->
+		console.log("INisde applyToEditor")
 		editor = atom.workspace.getActiveEditor()
 		editor.replaceSelectedText null, =>  "cubic-bezier(" + @points.join() + ")"
 		editor.clearSelections()
@@ -265,6 +262,8 @@ class CubicBezierCurve
 				row: @matcher.row
 
 		$(".cubic-bezier").css "display", 'none'
+		# Reset Points
+		@points = {}
 
 	selectMatches: () ->
 		editor = atom.workspace.getActiveEditor()
