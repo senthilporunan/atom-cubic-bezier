@@ -67,7 +67,7 @@ class CubicBezierCurve
 		@self = this
 		@playDurationInSec = 1.0
 
-		$("#easingList").val "default"
+		$("#easingList").val "custom"
 
 		canvas = document.getElementById("cubic-bezier")
 		@context = canvas.getContext("2d")
@@ -87,6 +87,8 @@ class CubicBezierCurve
 				$(this).data "x", left
 				$(this).data "y", top
 				self.plotCurve e
+				# When user drags the curve changing dropdown value to custom
+				$("#easingList").val "custom"
 
 		dragger = drag()
 
@@ -249,9 +251,13 @@ class CubicBezierCurve
 		@playBallPlaying = false
 
 	applyToEditor: () ->
-		editor = atom.workspace.getActiveEditor()
-		editor.replaceSelectedText null, => "cubic-bezier(" + @points.join() + ")"
+		if @points? and @points.length > 0
+			editor = atom.workspace.getActiveEditor()
+			editor.replaceSelectedText null, => "cubic-bezier(" + @points.join() + ")"
+
 		$(".cubic-bezier").css "display", 'none'
+		# Reset Points
+		@points =[]
 
 	selectMatches: () ->
 		editor = atom.workspace.getActiveEditor()
@@ -260,29 +266,32 @@ class CubicBezierCurve
 
 		@matcher = @selectLineMatches line, pos
 
-		points = @parseSelectedMatch()
-		unless points
-			points = 'default'
+		easing = @parseSelectedMatch()
+		console.log('Easing : '+ easing)
+		unless easing
+			console.log('New Easing : '+ easing)
+			easing = 'custom'
 
 		predefined =
 			ease: 'ease'
 			linear: 'linear'
-			'ease-in': 'easeIn'
-			'ease-out': 'easeOut'
-			'ease-in-out' : 'easeInOut'
-			'default': 'default'
+			'ease-in': 'ease-in'
+			'ease-out': 'ease-out'
+			'ease-in-out' : 'ease-in-out'
+			'custom': 'custom'
 
-		if predefined[points]?
-			@changeEasing predefined[points]
+		if predefined[easing]?
+			@changeEasing predefined[easing]
 		else
-			@coordinatesToPoints({top: points[1], left: points[0]}, {top: points[3], left: points[2]}, $("#cubic-bezier"))
-			@drawPoints()
-			@plotCurve()
-			@playBall()
+			#TODO: Points are not defined
+			#@coordinatesToPoints({top: points[1], left: points[0]}, {top: points[3], left: points[2]}, $("#cubic-bezier"))
+			#@drawPoints()
+			#@plotCurve()
+			#@playBall()
+			$("#easingList").val 'custom'
 
 		editor = atom.workspace.getActiveEditor()
 		editor.addSelectionForBufferRange([[@matcher.row, @matcher.start], [@matcher.row, @matcher.end]])
-
 	selectLineMatches: (line, pos) ->
 		row = pos.row
 		col = pos.column
@@ -302,16 +311,21 @@ class CubicBezierCurve
 				\)
 			///g
 			///
-				(ease|linear|ease-in|ease-out|ease-in-out)
+				(linear|ease-in-out|ease-in|ease-out|ease)
 			///g
 		]
 
 		for pattern in patterns
 			matches = line.match pattern
+			console.log matches + " " + pattern
 			if matches?
 				for match in matches
 					idx = line.indexOf match
 					len = match.length
+					console.log 'len - ' + len
+					console.log 'idx - ' + idx
+					console.log 'match - ' + match
+					console.log 'col - ' + col
 					if idx isnt -1 and idx <= col and idx + len >= col
 						return { start: idx, end: idx+len, pattern: pattern, select: match, row: row}
 		return {start: col, end: col, row: row}
@@ -322,10 +336,14 @@ class CubicBezierCurve
 
 		{pattern, select} = @matcher
 
+		console.log('pattern : '+pattern)
+		console.dir @matcher
 		return unless pattern or select
 
+		console.log('pattern : '+pattern)
 		[predefined, x1, y1, x2, y2] = p = select.match(pattern)
 
+		console.log p
 
 		if y1?
 			[x1, y1, x2, y2] = p = [
@@ -340,12 +358,12 @@ class CubicBezierCurve
 
 	changeEasing: (easing) =>
 		easingList =
-			"default": [ 0.74, 0.31, 0.37, 0.8 ]
+			"custom": [ 0.74, 0.31, 0.37, 0.8 ]
 			"linear": [0.0, 0.0, 1.0, 1.0 ]
 			"ease": [ 0.25, 0.1, 0.25, 0.1 ]
-			"easeIn": [ 0.42, 0.0, 1.0, 1.0 ]
-			"easeInOut": [ 0.42, 0.0, 0.58, 1.0 ]
-			"easeOut": [ 0.0, 0.0, 0.58, 1.0 ]
+			"ease-in": [ 0.42, 0.0, 1.0, 1.0 ]
+			"ease-in-out": [ 0.42, 0.0, 0.58, 1.0 ]
+			"ease-out": [ 0.0, 0.0, 0.58, 1.0 ]
 
 
 		$.map(easingList, (value, key) =>
@@ -355,3 +373,4 @@ class CubicBezierCurve
 		@drawPoints()
 		@plotCurve()
 		@playBall()
+		$("#easingList").val easing
