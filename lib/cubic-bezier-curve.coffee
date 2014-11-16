@@ -283,15 +283,6 @@ class CubicBezierCurve
 		editor = atom.workspace.getActiveEditor()
 		editor.addSelectionForBufferRange([[@matcher.row, @matcher.start], [@matcher.row, @matcher.end]])
 
-#		editor.addSelectionForBufferRange
-#		start:
-#			column: @matcher.start
-#			row: @matcher.row
-#		end:
-#			column: @matcher.end
-#			row: @matcher.row
-
-
 	selectLineMatches: (line, pos) ->
 		row = pos.row
 		col = pos.column
