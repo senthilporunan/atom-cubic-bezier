@@ -262,14 +262,12 @@ class CubicBezierCurve
 	selectMatches: () ->
 		editor = atom.workspace.getActiveEditor()
 		line = editor.getLastCursor().getCurrentBufferLine()
-		pos = editor.getCursorBufferPosition()
+		pos = editor.getCursorScreenPosition()
 
 		@matcher = @selectLineMatches line, pos
 
 		easing = @parseSelectedMatch()
-		console.log('Easing : '+ easing)
 		unless easing
-			console.log('New Easing : '+ easing)
 			easing = 'custom'
 
 		predefined =
@@ -283,11 +281,11 @@ class CubicBezierCurve
 		if predefined[easing]?
 			@changeEasing predefined[easing]
 		else
-			#TODO: Points are not defined
-			#@coordinatesToPoints({top: points[1], left: points[0]}, {top: points[3], left: points[2]}, $("#cubic-bezier"))
-			#@drawPoints()
-			#@plotCurve()
-			#@playBall()
+			points = @matcher.select.match(@matcher.pattern)[1..4]
+			@coordinatesToPoints({top: points[1], left: points[0]}, {top: points[3], left: points[2]}, $("#cubic-bezier"))
+			@drawPoints()
+			@plotCurve()
+			@playBall()
 			$("#easingList").val 'custom'
 
 		editor = atom.workspace.getActiveEditor()
@@ -296,18 +294,17 @@ class CubicBezierCurve
 		row = pos.row
 		col = pos.column
 
-		num = "\\d|\\d?\\.\\d+"
-		plusSign = "\\+?"
-		sign = "(?:\\+|-)?"
+		pnum = "\\+?\\d|\\+?\\d?\\.\\d+"
+		num = "(?:\\+|-)?\\d|(?:\\+|-)?\\d?\\.\\d+"
 		spaces = "\\s*"
 		patterns = [
 			///
 				cubic-bezier#{spaces}
 				\(
-					#{spaces}(#{plusSign}#{num})#{spaces},
-					#{spaces}(#{sign}#{num})#{spaces},
-					#{spaces}(#{plusSign}#{num})#{spaces},
-					#{spaces}(#{sign}#{num})#{spaces}
+					#{spaces}(#{pnum})#{spaces},
+					#{spaces}(#{num})#{spaces},
+					#{spaces}(#{pnum})#{spaces},
+					#{spaces}(#{num})#{spaces}
 				\)
 			///g
 			///
@@ -317,17 +314,12 @@ class CubicBezierCurve
 
 		for pattern in patterns
 			matches = line.match pattern
-			console.log matches + " " + pattern
 			if matches?
 				for match in matches
 					idx = line.indexOf match
 					len = match.length
-					console.log 'len - ' + len
-					console.log 'idx - ' + idx
-					console.log 'match - ' + match
-					console.log 'col - ' + col
 					if idx isnt -1 and idx <= col and idx + len >= col
-						return { start: idx, end: idx+len, pattern: pattern, select: match, row: row}
+						return { start: idx, end: idx+len, pattern: pattern.source, select: match, row: row}
 		return {start: col, end: col, row: row}
 
 
@@ -335,15 +327,9 @@ class CubicBezierCurve
 		return unless @matcher?
 
 		{pattern, select} = @matcher
-
-		console.log('pattern : '+pattern)
-		console.dir @matcher
 		return unless pattern or select
 
-		console.log('pattern : '+pattern)
 		[predefined, x1, y1, x2, y2] = p = select.match(pattern)
-
-		console.log p
 
 		if y1?
 			[x1, y1, x2, y2] = p = [

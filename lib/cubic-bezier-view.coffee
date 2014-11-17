@@ -39,9 +39,6 @@ class CubicBezierView extends View
     @detach()
 
   toggle: ->
-    editor = atom.workspace.getActiveEditor()
-    pos = editor.getCursorBufferPosition()
-    console.log("Row: "+pos.row)
     atom.workspaceView.append(this)
     @cubicBezier = new CubicBezierCurve() unless @cubicBezier
     console.log @cubicBezier
