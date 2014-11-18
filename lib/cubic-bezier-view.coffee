@@ -15,14 +15,14 @@ class CubicBezierView extends View
         @button id: "P1", class: "curve-pointer moveable ui-draggable ui-draggable-handle"
         @button id: "playBall", class: "curve-pointer moveable"
         @select id: "easingList", style: "width: 214px; height: 31px;", =>
-          @option value: "default", selected: true, "default"
+          @option value: "custom", selected: true, "custom"
           @option value: "linear", "linear"
           @option value: "ease", "ease"
-          @option value: "easeIn", "easeIn"
-          @option value: "easeInOut", "easeInOut"
-          @option value: "easeOut", "easeOut"
+          @option value: "ease-in", "ease-in"
+          @option value: "ease-in-out", "ease-in-out"
+          @option value: "ease-out", "ease-out"
       @div id: "drawing-button", =>
-        @button id: "okButton", style: "width:107px;height: 30px;margin: 5px 4px 0 0px;", "Save"
+        @button id: "okButton", style: "width:107px;height: 30px;margin: 5px 4px 0 0px;", "Apply"
         @button id: "cancelButton", style: "width:107px;height: 30px;margin-top:5px;", "Close"
 
 
@@ -39,9 +39,6 @@ class CubicBezierView extends View
     @detach()
 
   toggle: ->
-    editor = atom.workspace.getActiveEditor()
-    pos = editor.getCursorBufferPosition()
-    console.log("Row: "+pos.row)
     atom.workspaceView.append(this)
     @cubicBezier = new CubicBezierCurve() unless @cubicBezier
     console.log @cubicBezier
