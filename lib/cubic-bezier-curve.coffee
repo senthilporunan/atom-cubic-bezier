@@ -318,8 +318,11 @@ class CubicBezierCurve
 				for match in matches
 					idx = line.indexOf match
 					len = match.length
-					if idx isnt -1 and idx <= col and idx + len >= col
+					someMatch = match
+					somePattern = pattern
+					if idx isnt -1 and idx <= col + 1 and idx + len >= col - 1
 						return { start: idx, end: idx+len, pattern: pattern.source, select: match, row: row}
+
 		return {start: col, end: col, row: row}
 
 
