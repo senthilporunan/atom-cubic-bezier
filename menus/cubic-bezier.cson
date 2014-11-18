@@ -8,7 +8,7 @@
     'submenu': [
       'label': 'Cubic Bezier'
       'submenu': [
-        { 'label': 'Toggle', 'command': 'cubic-bezier:open' }
+        { 'label': 'Open/Reset', 'command': 'cubic-bezier:open' }
       ]
     ]
   }

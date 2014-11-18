@@ -100,7 +100,7 @@ class CubicBezierCurve
 			cancel: false
 			stack: ".curve-pointer"
 
-		$(canvas).on 'mousemove', (e) => @timeDelay e
+		$(canvas).on 'mousemove', (e) => @plotCurve e
 		@plotCurve()
 		@playBall()
 
@@ -178,11 +178,10 @@ class CubicBezierCurve
 		dty = w + adj + 30
 		ddy = adj - 10
 
-		#bg color
-		@context.fillStyle = "rgb(255, 255, 255)"
-		@context.font = "14px times"
-		@context.fillRect 0, dty - 15, w, 20
-		@context.fillRect 0, ddy - 15, w, 20
+		#bg color - performance improvement by replacing plotCurve by timeDelay on mousemove event
+#		@context.fillStyle = "rgb(255, 255, 255)"
+#		@context.fillRect 50, dty - 15, 120, 20
+#		@context.fillRect 50, ddy - 15, 140, 20
 
 		@context.fillStyle = "rgba(0, 0, 0, 0.4)"
 		@context.font = "14px times"
@@ -268,7 +267,7 @@ class CubicBezierCurve
 
 		easing = @parseSelectedMatch()
 		unless easing
-			easing = 'custom'
+			easing = 'ease-in-out'
 
 		predefined =
 			ease: 'ease'
@@ -318,8 +317,6 @@ class CubicBezierCurve
 				for match in matches
 					idx = line.indexOf match
 					len = match.length
-					someMatch = match
-					somePattern = pattern
 					if idx isnt -1 and idx <= col + 1 and idx + len >= col - 1
 						return { start: idx, end: idx+len, pattern: pattern.source, select: match, row: row}
 
