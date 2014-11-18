@@ -1,4 +1,3 @@
-# See https://atom.io/docs/latest/creating-a-package#menus for more details
 'context-menu':
   '.overlayer':
       'Cubic Bezier': 'cubic-bezier:open'
@@ -9,7 +8,7 @@
     'submenu': [
       'label': 'Cubic Bezier'
       'submenu': [
-        { 'label': 'Open/Reset', 'command': 'cubic-bezier:open' }
+        { 'label': 'Toggle', 'command': 'cubic-bezier:open' }
       ]
     ]
   }
