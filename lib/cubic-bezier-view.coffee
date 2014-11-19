@@ -41,5 +41,4 @@ class CubicBezierView extends View
   toggle: ->
     atom.workspaceView.append(this)
     @cubicBezier = new CubicBezierCurve() unless @cubicBezier
-    console.log @cubicBezier
     @cubicBezier.showCubicBezier()
