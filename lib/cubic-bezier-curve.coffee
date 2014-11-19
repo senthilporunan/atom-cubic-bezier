@@ -250,13 +250,23 @@ class CubicBezierCurve
 		@playBallPlaying = false
 
 	applyToEditor: () ->
-		if @points? and @points.length > 0
+		easing = $("#easingList").val()
+
+		if easing isnt 'custom'
+			output = easing
+		else if @points? and @points.length > 0
+			output = "cubic-bezier(" + @points.join() + ")"
+
+		if output?
 			editor = atom.workspace.getActiveEditor()
-			editor.replaceSelectedText null, => "cubic-bezier(" + @points.join() + ")"
+			editor.addSelectionForBufferRange([[@matcher.row, @matcher.start], [@matcher.row, @matcher.end]])
+			editor.replaceSelectedText null, => output
+			editor.consolidateSelections()
 
 		$(".cubic-bezier").css "display", 'none'
 		# Reset Points
-		@points =[]
+		@points = []
+
 
 	selectMatches: () ->
 		editor = atom.workspace.getActiveEditor()
@@ -264,6 +274,8 @@ class CubicBezierCurve
 		pos = editor.getCursorScreenPosition()
 
 		@matcher = @selectLineMatches line, pos
+
+		@positioning pos.column
 
 		easing = @parseSelectedMatch()
 		unless easing
@@ -289,6 +301,10 @@ class CubicBezierCurve
 
 		editor = atom.workspace.getActiveEditor()
 		editor.addSelectionForBufferRange([[@matcher.row, @matcher.start], [@matcher.row, @matcher.end]])
+
+
+
+
 	selectLineMatches: (line, pos) ->
 		row = pos.row
 		col = pos.column
@@ -360,3 +376,31 @@ class CubicBezierCurve
 		@plotCurve()
 		@playBall()
 		$("#easingList").val easing
+
+	positioning: (col) =>
+		overlay = $('.cubic-bezier.overlay')
+		activeView = atom.workspaceView.getActivePaneView().activeView
+		{top, left} = activeView.pixelPositionForScreenPosition activeView.getEditor().getCursorScreenPosition()
+		[viewWidth, viewHeight] = [activeView.width(), activeView.height()]
+		[cbWidth, cbHeight] = [overlay.width(), overlay.height()]
+		offset = activeView.offset()
+
+		targetLeft = offset.left + left + cbWidth
+		targetTop = offset.top + top
+
+		if targetLeft > viewWidth
+			targetLeft = viewWidth - cbWidth
+
+		if targetTop > viewHeight - cbHeight
+			targetTop = viewHeight - cbHeight - 5
+
+
+		if targetTop < offset.top
+			targetTop = offset.top + 5
+
+		if targetLeft < 300
+			targetLeft = 300
+
+		overlay.css
+			top: targetTop
+			left: targetLeft
