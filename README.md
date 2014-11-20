@@ -1,4 +1,4 @@
-atom-cubic-bezier
+atom-cubic-bezier [![Build Status](https://travis-ci.org/senthilporunan/atom-cubic-bezier.svg?branch=master)](https://travis-ci.org/senthilporunan/atom-cubic-bezier)
 =================
 
 atom-cubic-bezier  is an easing function generator for Atom editor
