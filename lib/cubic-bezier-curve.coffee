@@ -1,5 +1,6 @@
 $ = require("jquery")
 require('jquery-ui/draggable');
+#CubicBezierView = require '../lib/cubic-bezier-view'
 
 module.exports =
 class CubicBezierCurve
@@ -62,7 +63,8 @@ class CubicBezierCurve
 		]
 		@timeDelay e
 
-	showCubicBezier : ->
+	showCubicBezier : (cbView) ->
+		@cbView = cbView
 		$(".cubic-bezier").css "display", 'initial'
 		@self = this
 		@playDurationInSec = 1.0
@@ -73,8 +75,12 @@ class CubicBezierCurve
 		@context = canvas.getContext("2d")
 		@selectMatches()
 
-		$('#okButton').click (e) => @applyToEditor()
-		$('#cancelButton').click (e) =>  $(".cubic-bezier").css "display", 'none'
+		$('#okButton').click (e) =>
+			@applyToEditor()
+			@cbView.detach()
+		$('#cancelButton').click (e) =>
+			#$(".cubic-bezier").css "display", 'none'
+			@cbView.detach()
 		$('#easingList').change (e) => @changeEasing($("#easingList").val())
 
 		drag = () =>
@@ -261,11 +267,9 @@ class CubicBezierCurve
 			editor = atom.workspace.getActiveEditor()
 			editor.addSelectionForBufferRange([[@matcher.row, @matcher.start], [@matcher.row, @matcher.end]])
 			editor.replaceSelectedText null, => output
-			editor.consolidateSelections()
+			editor.clearSelections()
 
-		$(".cubic-bezier").css "display", 'none'
-		# Reset Points
-		@points = []
+
 
 
 	selectMatches: () ->
@@ -380,7 +384,7 @@ class CubicBezierCurve
 	positioning: (col) =>
 		overlay = $('.cubic-bezier.overlay')
 		activeView = atom.workspaceView.getActivePaneView().activeView
-		{top, left} = activeView.pixelPositionForScreenPosition activeView.getEditor().getCursorScreenPosition()
+		{top, left} = activeView.getEditor().pixelPositionForScreenPosition activeView.getEditor().getCursorScreenPosition()
 		[viewWidth, viewHeight] = [activeView.width(), activeView.height()]
 		[cbWidth, cbHeight] = [overlay.width(), overlay.height()]
 		offset = activeView.offset()

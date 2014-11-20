@@ -28,7 +28,6 @@ class CubicBezierView extends View
 
 
   initialize: (serializeState) ->
-    @cubicBezier = new CubicBezierCurve()
     atom.workspaceView.command "cubic-bezier:open", => @toggle()
 
   # Returns an object that can be retrieved when package is activated
@@ -39,6 +38,9 @@ class CubicBezierView extends View
     @detach()
 
   toggle: ->
-    atom.workspaceView.append(this)
-    @cubicBezier = new CubicBezierCurve() unless @cubicBezier
-    @cubicBezier.showCubicBezier()
+    if @hasParent()
+      @detach()
+    else
+      atom.workspaceView.append(this)
+      @cubicBezier = new CubicBezierCurve() unless @cubicBezier
+      @cubicBezier.showCubicBezier(this)
