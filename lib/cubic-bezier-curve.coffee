@@ -1,6 +1,5 @@
 $ = require("jquery")
-require('jquery-ui/draggable');
-#CubicBezierView = require '../lib/cubic-bezier-view'
+require("../lib/draggable.js");
 
 module.exports =
 class CubicBezierCurve
