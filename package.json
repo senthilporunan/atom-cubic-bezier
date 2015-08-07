@@ -1,7 +1,7 @@
 {
   "name": "cubic-bezier",
   "main": "./lib/cubic-bezier",
-  "version": "1.5.0",
+  "version": "1.5.3",
   "description": "Cubic Bezier curve: An easing function generator for Atom editor",
   "activationCommands": [
     "cubic-bezier:open"
