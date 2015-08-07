@@ -1,5 +1,5 @@
-{View} = require 'atom'
-$ = require('atom').$
+{View} = require('atom-space-pen-views').SelectListView;
+#$ = require('atom').$
 CubicBezierCurve = require './cubic-bezier-curve'
 
 module.exports =
