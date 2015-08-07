@@ -1,7 +1,6 @@
 {View} = require 'atom'
 $ = require('atom').$
 CubicBezierCurve = require './cubic-bezier-curve'
-hideWindow = false
 
 module.exports =
 class CubicBezierView extends View
