@@ -1,7 +1,7 @@
 
 
-{View} = require 'atom-space-pen-views';
-#$ = require('atom').$
+{View} = require 'atom-space-pen-views'
+$ = require 'atom'
 
 CubicBezierCurve = require './cubic-bezier-curve'
 
