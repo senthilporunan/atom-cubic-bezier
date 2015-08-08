@@ -30,7 +30,9 @@ class CubicBezierView extends View
 
 
   initialize: (serializeState) ->
-    atom.workspaceView.command "cubic-bezier:open", => @toggle()
+    atom.commands.add '.tree-view .selected',
+      'cubic-bezier:open': (event) => @toggle()
+    #atom.workspaceView.command "cubic-bezier:open", => @toggle()
 
   # Returns an object that can be retrieved when package is activated
   serialize: ->
