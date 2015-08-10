@@ -263,6 +263,8 @@ class CubicBezierCurve
 			output = "cubic-bezier(" + @points.join() + ")"
 
 		if output?
+			console.log 'Output martches'
+			console.log atom.workspace
 			editor = atom.workspace.getActiveEditor()
 			editor.addSelectionForBufferRange([[@matcher.row, @matcher.start], [@matcher.row, @matcher.end]])
 			editor.replaceSelectedText null, => output
@@ -272,6 +274,8 @@ class CubicBezierCurve
 
 
 	selectMatches: () ->
+		console.log 'Select martches'
+		console.log atom.workspace
 		editor = atom.workspace.getActiveEditor()
 		line = editor.getLastCursor().getCurrentBufferLine()
 		pos = editor.getCursorScreenPosition()
@@ -382,6 +386,7 @@ class CubicBezierCurve
 
 	positioning: (col) =>
 		overlay = $('.cubic-bezier.overlay')
+		console.log atom.workspaceView
 		activeView = atom.workspaceView.getActivePaneView().activeView
 		{top, left} = activeView.getEditor().pixelPositionForScreenPosition activeView.getEditor().getCursorScreenPosition()
 		[viewWidth, viewHeight] = [activeView.width(), activeView.height()]
