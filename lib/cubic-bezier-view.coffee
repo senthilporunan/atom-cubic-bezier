@@ -30,6 +30,8 @@ class CubicBezierView extends View
 
 
   initialize: (serializeState) ->
+    console.log atom
+    console.log atom.commands
     atom.commands.add atom.views.getView(atom.workspace),
       'cubic-bezier:open': (event) => @toggle()
     #atom.workspaceView.command "cubic-bezier:open", => @toggle()
@@ -45,6 +47,8 @@ class CubicBezierView extends View
     if @hasParent()
       @detach()
     else
+      console.log atom
+      console.log atom.workspace
       atom.workspaceView.append(this)
       @cubicBezier = new CubicBezierCurve() unless @cubicBezier
       @cubicBezier.showCubicBezier(this)
