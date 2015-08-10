@@ -49,6 +49,7 @@ class CubicBezierView extends View
     else
       console.log atom
       console.log atom.workspace
-      atom.workspaceView.append(this)
+      @panel ?= atom.workspace.addBottomPanel(item: this)
+      @panel.show()
       @cubicBezier = new CubicBezierCurve() unless @cubicBezier
       @cubicBezier.showCubicBezier(this)
