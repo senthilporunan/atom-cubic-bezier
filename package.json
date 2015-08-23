@@ -1,18 +1,20 @@
 {
   "name": "cubic-bezier",
   "main": "./lib/cubic-bezier",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Cubic Bezier curve: An easing function generator for Atom editor",
-  "activationEvents": [
-    "cubic-bezier:open"
-  ],
+  "activationCommands": {
+    "atom-workspace": [
+      "cubic-bezier:open"
+    ]
+  },
   "repository": "https://github.com/senthilporunan/atom-cubic-bezier",
   "license": "MIT",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": ">=0.174.0 <2.0.0"
   },
   "dependencies": {
-    "jquery": "*",
-    "jquery-ui": "*"
+    "jquery": "^2",
+    "atom-space-pen-views": "^2.0.3"
   }
 }
