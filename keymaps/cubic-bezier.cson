@@ -7,5 +7,5 @@
 
 # For more detailed documentation see
 # https://atom.io/docs/latest/advanced/keymaps
-'atom-workspace':
-   'ctrl-alt-b': 'cubic-bezier:open'
+'.atom-workspace':
+  'ctrl-alt-b': 'cubic-bezier:open'
