@@ -1,22 +1,19 @@
 
 CubicBezierView = require '../lib/cubic-bezier-view'
 CubicBezierCurve = require '../lib/cubic-bezier-curve'
-{WorkspaceView} = require 'atom'
+{View} = require 'atom-space-pen-views'
 $ = require("jquery")
 
 describe "CubicBezierView", ->
 
-  [editorView, cubicView, activationPromise, workspaceElement] = []
+  [editorView, cubicView, activationPromise] = []
   beforeEach ->
+      waitsForPromise -> atom.workspace.open('sample.js')
       runs ->
-        atom.workspaceView = new WorkspaceView()
-
-      waitsForPromise -> atom.workspaceView.open('sample.js')
-
-      runs ->
-        atom.workspaceView.attachToDom()
-        editorView = atom.workspaceView.getActiveView()
-        editorView.setText("cubic-bezier(0.7, 0.4, 0.4, 1)")
+        editor = atom.workspace.getActiveTextEditor()
+        editorView = atom.views.getView(editor)
+        jasmine.attachToDOM(editorView)
+        editor.getBuffer().setText("cubic-bezier(0.7, 0.4, 0.4, 1)")
 
       activationPromise = atom.packages.activatePackage("cubic-bezier").then ({mainModule}) ->
         mainModule.createViews()
@@ -24,14 +21,16 @@ describe "CubicBezierView", ->
 
   describe 'check the window open', ->
     it 'should have open the view', ->
-      editorView.trigger 'cubic-bezier:open'
+      atom.commands.dispatch editorView, 'cubic-bezier:open'
+      waitsForPromise ->
+         activationPromise
 
       runs ->
-        expect(atom.workspaceView.find('.cubic-bezier').length).toEqual(1)
+        expect($(editorView).find('.cubic-bezier').length).toEqual(1)
 
   describe 'check the window close', ->
     it 'should have open the view', ->
       $('#cancelButton').click()
 
       runs ->
-        expect(atom.workspaceView.find('.cubic-bezier').length).toEqual(0)
+        expect($(editorView).find('.cubic-bezier').length).toEqual(0)

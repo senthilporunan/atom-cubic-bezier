@@ -1,12 +1,10 @@
-
-
 {View} = require 'atom-space-pen-views'
-$ = require 'atom'
-
+$ = require('atom-space-pen-views').$
 CubicBezierCurve = require './cubic-bezier-curve'
 
 module.exports =
 class CubicBezierView extends View
+
   @content: ->
     @div class: 'cubic-bezier overlay from-top', =>
       @div id: "drawing-plane", class: "drawing-plane", =>
@@ -30,11 +28,8 @@ class CubicBezierView extends View
 
 
   initialize: (serializeState) ->
-    console.log atom
-    console.log atom.commands
-    atom.commands.add atom.views.getView(atom.workspace),
-      'cubic-bezier:open': (event) => @toggle()
-    #atom.workspaceView.command "cubic-bezier:open", => @toggle()
+    atom.commands.add 'atom-workspace',
+      "cubic-bezier:open", => @toggle()
 
   # Returns an object that can be retrieved when package is activated
   serialize: ->
@@ -47,9 +42,6 @@ class CubicBezierView extends View
     if @hasParent()
       @detach()
     else
-      console.log atom
-      console.log atom.workspace
-      @panel ?= atom.workspace.addBottomPanel(item: this)
-      @panel.show()
+      atom.workspace.addModalPanel({item:this})
       @cubicBezier = new CubicBezierCurve() unless @cubicBezier
       @cubicBezier.showCubicBezier(this)

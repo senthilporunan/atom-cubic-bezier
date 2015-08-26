@@ -76,8 +76,10 @@ class CubicBezierCurve
 
 		$('#okButton').click (e) =>
 			@applyToEditor()
+			$(@cbView).parent().hide()
 			@cbView.detach()
 		$('#cancelButton').click (e) =>
+			$(@cbView).parent().hide()
 			#$(".cubic-bezier").css "display", 'none'
 			@cbView.detach()
 		$('#easingList').change (e) => @changeEasing($("#easingList").val())
@@ -263,9 +265,7 @@ class CubicBezierCurve
 			output = "cubic-bezier(" + @points.join() + ")"
 
 		if output?
-			console.log 'Output martches'
-			console.log atom.workspace
-			editor = atom.workspace.getActiveEditor()
+			editor = atom.workspace.getActiveTextEditor()
 			editor.addSelectionForBufferRange([[@matcher.row, @matcher.start], [@matcher.row, @matcher.end]])
 			editor.replaceSelectedText null, => output
 			editor.clearSelections()
@@ -274,9 +274,7 @@ class CubicBezierCurve
 
 
 	selectMatches: () ->
-		console.log 'Select martches'
-		console.log atom.workspace
-		editor = atom.workspace.getActiveEditor()
+		editor = atom.workspace.getActiveTextEditor()
 		line = editor.getLastCursor().getCurrentBufferLine()
 		pos = editor.getCursorScreenPosition()
 
@@ -306,7 +304,7 @@ class CubicBezierCurve
 			@playBall()
 			$("#easingList").val 'custom'
 
-		editor = atom.workspace.getActiveEditor()
+		editor = atom.workspace.getActiveTextEditor()
 		editor.addSelectionForBufferRange([[@matcher.row, @matcher.start], [@matcher.row, @matcher.end]])
 
 
@@ -386,29 +384,23 @@ class CubicBezierCurve
 
 	positioning: (col) =>
 		overlay = $('.cubic-bezier.overlay')
-		console.log atom.workspaceView
-		activeView = atom.workspaceView.getActivePaneView().activeView
-		{top, left} = activeView.getEditor().pixelPositionForScreenPosition activeView.getEditor().getCursorScreenPosition()
+		activeEditor = atom.workspace.getActiveTextEditor()
+		activeEditorView = atom.views.getView(activeEditor)
+		activeView = $(atom.views.getView(atom.workspace.getActivePane()))
+
+		{top, left} = activeEditorView.pixelPositionForScreenPosition activeEditor.getCursorScreenPosition()
 		[viewWidth, viewHeight] = [activeView.width(), activeView.height()]
 		[cbWidth, cbHeight] = [overlay.width(), overlay.height()]
 		offset = activeView.offset()
 
-		targetLeft = offset.left + left + cbWidth
-		targetTop = offset.top + top
-
-		if targetLeft > viewWidth
-			targetLeft = viewWidth - cbWidth
-
-		if targetTop > viewHeight - cbHeight
-			targetTop = viewHeight - cbHeight - 5
-
-
-		if targetTop < offset.top
-			targetTop = offset.top + 5
-
-		if targetLeft < 300
-			targetLeft = 300
+		leftPanels = atom.workspace.getLeftPanels()
+		topPanels = atom.workspace.getTopPanels()
+		leftWidth = topHeight = 50
+		if leftPanels.length > 0
+			leftWidth = leftPanels.reduce(((w, panel) => w + $(atom.views.getView(panel)).width()), leftWidth)
+		if topPanels.length > 0
+			topHeight = topPanels.reduce(((h, panel) => h + $(atom.views.getView(panel)).height()), topHeight)
 
 		overlay.css
-			top: targetTop
-			left: targetLeft
+			top: topHeight
+			left: (left + leftWidth) > viewWidth - cbWidth ? left - leftWidth : left + leftWidth
